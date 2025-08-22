@@ -136,3 +136,17 @@ You need to setup PyODK configuration as mentioned in the documentation of PyODK
 
 
 ``
+## 🛣️ Roadmap and Future Goals
+
+This project is a work in progress, and I have a clear roadmap for adding more useful functionalities.
+
+### ✅Achieved Features:
+- Listing Projects & Forms: The server can list all projects and forms on your ODK Central instance.
+- Data Download & Storage: The get_data tool fetches submission data and saves it to a local database for efficient access.
+- Automatic Analysis: By working with the Database MCP Server, the AI can perform automatic analysis and generate informative reports and analyses from the collected data.
+
+### 🎯Planned Features:
+- Data Export: Export form data to CSV, JSON, or Excel formats to desired folder as requested by user.
+- Form Management: Tools to create new forms or update existing ones.
+- Incorporate [PyXComparer](https://github.com/joybindroo/PyXComparer) features for XLSForm version monitoring.
+- Project Management: Functionality to create and manage ODK Central projects.
