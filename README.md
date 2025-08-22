@@ -1,10 +1,10 @@
-### 🚀 ODK Central MCP Server
+# 🚀 Python MCP Server for ODK
 
-A Model Context Protocol (MCP) Server for ODK Central, enabling AI agents to interact with your data collection projects and forms. This server works in tandem with a separate dedicated **Python Database MCP Server** to provide a seamless and powerful ODK data analysis experience on AI Chatbot Applications like Claude Desktop & VS Code. Leverage the power of this server to bring your ODK workflow into the age of AI-powered assistants.
+A Model Context Protocol (MCP) Server for ODK Central, enabling AI agents to interact with your data collection projects and forms using powerful [PyODK](https://github.com/getodk/pyodk) Python library. This server works in tandem with a separate dedicated **Python Database MCP Server** to provide a seamless and powerful ODK data analysis experience on AI Chatbot Applications like Claude Desktop & VS Code. Leverage the power of this server to bring your ODK workflow into the age of AI-powered assistants.
 
 ***
 
-### 🛠️ Tools and Dual-Server Workflow
+## 🛠️ Tools and Dual-Server Workflow
 
 This setup utilizes two separate, but interconnected, MCP servers to create a robust agentic workflow. This design allows for both direct interaction with ODK Central and sophisticated querying of locally stored data. 
 
@@ -23,9 +23,10 @@ This is the central data retrieval tool. It fetches submission data for a specif
 
 ### 🤝 The Integrated Database MCP Workflow
 
-The true power of this setup lies in the **synergy between the two servers**. After the `get_data` tool has been used, the AI agent can transition to using the (Python Database MCP Server)[https://github.com/joybindroo/pyMCP] for follow-up queries. You can read more about installing and using this on the Github Repository page (https://github.com/joybindroo/pyMCP)[https://github.com/joybindroo/pyMCP]
+The true power of this setup lies in the **synergy between the two servers**. After the `get_data` tool has been used, the AI agent can transition to using the [Python Database MCP Server](https://github.com/joybindroo/pyMCP) for follow-up queries. You can read more about installing and using this on the Github Repository page [https://github.com/joybindroo/pyMCP](https://github.com/joybindroo/pyMCP)
 
-Once both the ODK MCP Server and the Database MCP Server are setup and running in VS Code or Claude Desktop, the user can use natural language to know details about projects and forms of interest, download latest data of the required form and do data analysis from the local database.
+## 🪴How to use
+Once both the ODK MCP Server and the Database MCP Server are setup and running in VS Code or Claude Desktop, the user can then chat with the AI in the provided chatbox interface. They can type or say their queries in natural language to Claude Sonnet 4 or GPT-4.1 and know details about the projects and forms of interest. User can easily download latest data of the required form, and do data analysis from the local database.
 
 For example, a user could type:
 
@@ -54,9 +55,9 @@ The user can then ask the AI:
 The AI recognizes this is a database query and seamlessly switches to using the **Database MCP Server**. It translates the natural language request into a precise SQL query, runs it against the local database, and provides the result. This allows for complex analytical queries to be resolved quickly and efficiently, turning your chat with the AI into a powerful data analysis tool.
 
 
-# PyODK MCP Server Setup & Configuration
+## PyODK MCP Server Setup & Configuration
 
-## Installation
+### Installation
 
 1. **Clone or download this repository**
 
@@ -114,10 +115,10 @@ chmod +x odk_mcp_server.py
 }
 ```
 
-## Environment Configuration
+## Credentials for Accessing ODK Central Server
 
-By default the server will run using (PyODK's configuration)[https://github.com/getodk/pyodk?tab=readme-ov-file#configure]
-
+By default the server will run using [PyODK's configuration](https://github.com/getodk/pyodk?tab=readme-ov-file#configure)
+You need to setup PyODK configuration as mentioned in the documentation of PyODK.
 
 
 ## Troubleshooting
