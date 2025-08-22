@@ -23,7 +23,7 @@ This is the central data retrieval tool. It fetches submission data for a specif
 
 ### 🤝 The Integrated Database MCP Workflow
 
-The true power of this setup lies in the **synergy between the two servers**. After the `get_data` tool has been used, the AI agent can transition to using the [Python Database MCP Server](https://github.com/joybindroo/pyMCP) for follow-up queries. You can read more about installing and using this on the Github Repository page [https://github.com/joybindroo/pyMCP](https://github.com/joybindroo/pyMCP)
+The true power of this setup lies in the fact that AI Agent is able to use two servers in same conversation thread**. After using the `get_data` tool available in ODK MCP Server, the AI agent can transition to using the [Python Database MCP Server](https://github.com/joybindroo/pyMCP) for follow-up queries as per user need. You can read more about installing and using this on the Github Repository page [https://github.com/joybindroo/pyMCP](https://github.com/joybindroo/pyMCP)
 
 ## 🪴How to use
 Once both the ODK MCP Server and the Database MCP Server are setup and running in VS Code or Claude Desktop, the user can then chat with the AI in the provided chatbox interface. They can type or say their queries in natural language to Claude Sonnet 4 or GPT-4.1 and know details about the projects and forms of interest. User can easily download latest data of the required form, and do data analysis from the local database.
@@ -138,15 +138,22 @@ You need to setup PyODK configuration as mentioned in the documentation of PyODK
 ``
 ## 🛣️ Roadmap and Future Goals
 
-This project is a work in progress, and I have a clear roadmap for adding more useful functionalities.
+This project is a work in progress, and the aim is to keep adding more useful functionalities.
 
 ### ✅Achieved Features:
 - Listing Projects & Forms: The server can list all projects and forms on your ODK Central instance.
 - Data Download & Storage: The get_data tool fetches submission data and saves it to a local database for efficient access.
 - Automatic Analysis: By working with the Database MCP Server, the AI can perform automatic analysis and generate informative reports and analyses from the collected data.
 
+
+
 ### 🎯Planned Features:
 - Data Export: Export form data to CSV, JSON, or Excel formats to desired folder as requested by user.
 - Form Management: Tools to create new forms or update existing ones.
 - Incorporate [PyXComparer](https://github.com/joybindroo/PyXComparer) features for XLSForm version monitoring.
 - Project Management: Functionality to create and manage ODK Central projects.
+
+
+## 🤝 Community Feedback
+
+I'm keen to hear your thoughts and feedback on this project. If you find this MCP server useful for your ODK related data collection and analysis work, please consider giving the repository a star. If you are interested in contributing or have ideas for new tools, let's work together to build a more productive ODK ecosystem. Your input is valuable for this project.
