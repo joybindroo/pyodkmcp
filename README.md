@@ -1,159 +1,90 @@
 # 🚀 Python MCP Server for ODK
 
-A Model Context Protocol (MCP) Server for ODK Central, enabling AI agents to interact with your data collection projects and forms using powerful [PyODK](https://github.com/getodk/pyodk) Python library. This server works in tandem with a separate dedicated **Python Database MCP Server** to provide a seamless and powerful ODK data analysis experience on AI Chatbot Applications like Claude Desktop & VS Code. Leverage the power of this server to bring your ODK workflow into the age of AI-powered assistants.
+A Model Context Protocol (MCP) Server for ODK Central, enabling AI agents to interact with your data collection projects and forms using the powerful [PyODK](https://github.com/getodk/pyodk) Python library. 
 
-***
+This server acts as the **Ingestion Layer**, fetching data from ODK Central and storing it in a local SQLite database, which is then queried by a dedicated **Database MCP Server** (like [pyMCP](https://github.com/joybindroo/pyMCP)) for high-performance analysis.
+
+---
 
 ## 🛠️ Tools and Dual-Server Workflow
 
-This setup utilizes two separate, but interconnected, MCP servers to create a robust agentic workflow. This design allows for both direct interaction with ODK Central and sophisticated querying of locally stored data. 
+This setup utilizes two separate, but interconnected, MCP servers to create a robust agentic workflow.
 
-#### 1. `list_projects()`
-This tool fetches and returns a list of all projects on the ODK Central server. It's the first step for an AI agent to understand your data collection projects.
+### 1. ODK MCP Server (The Ingestor)
+This server handles the communication with the ODK Central API:
+- `list_projects()`: Fetches all projects available to the configured user.
+- `list_forms(project_id: int)`: Retrieves all forms within a specific project.
+- `get_data(project_id_str: str, form_id_str: str)`: 
+    - Fetches submission data.
+    - Flattens nested JSON into a tabular format using `pandas`.
+    - Stores the data in a local SQLite table named `data_pid_{project_id}__fid_{form_id}`.
+    - Logs the sync timestamp in the `table_log` table.
 
-#### 2. `list_forms(project_id: int)`
-This tool retrieves a list of all forms within a specific ODK Central project, allowing the agent to navigate your data structure.
+### 2. Database MCP Server (The Analyst)
+Once `get_data` has synced the information, the AI agent transitions to the Database MCP Server (pyMCP) to perform natural language SQL queries against the local SQLite file.
 
-#### 3. `get_data(project_id_str: str, form_id_str: str)`
-This is the central data retrieval tool. It fetches submission data for a specified form and performs a critical two-part action:
-- It saves the fetched data into a local database table. The table is automatically named using a combination of the **project ID and form ID** for easy identification.
-- It provides the user with a summary of the data from a small sample, giving a quick overview without overwhelming them.
+---
 
-***
+## 🪴 Installation & Setup
 
-### 🤝 The Integrated Database MCP Workflow
+### 1. Prerequisites
+- Python 3.12+
+- A configured PyODK environment (see [PyODK Configuration](https://github.com/getodk/pyodk#configure)).
 
-The true power of this setup lies in the fact that AI Agent is able to use two servers in same conversation thread**. After using the `get_data` tool available in ODK MCP Server, the AI agent can transition to using the [Python Database MCP Server](https://github.com/joybindroo/pyMCP) for follow-up queries as per user need. You can read more about installing and using this on the Github Repository page [https://github.com/joybindroo/pyMCP](https://github.com/joybindroo/pyMCP)
-
-## 🪴How to use
-Once both the ODK MCP Server and the Database MCP Server are setup and running in VS Code or Claude Desktop, the user can then chat with the AI in the provided chatbox interface. They can type or say their queries in natural language to Claude Sonnet 4 or GPT-4.1 and know details about the projects and forms of interest. User can easily download latest data of the required form, and do data analysis from the local database.
-
-For example, a user could type:
-
-> "How many projects are there"
-or
-> "Which projects are running in Bihar and Jharkhand "
-
-The AI will execute this action and provide a list of the projects accessible to the ODK Central user setup in the PyODK's config. From that point on, in the same chat session, the user can ask for details about the forms existing in the projects.
-
-> "get forms in project abc"
-The AI will execute this action and provide a list of forms existing in abc project.
-
-The user can then ask the AI:
-> "get data of form xyz"
-or
-> "get data of all the forms in project A and project B"
-or
-> "get data of daily reportin form from ABC project"
-
-The AI will execute this action, store the data locally, and provide a brief summary. From that point on, in the same chat session, the user can ask detailed analytical questions without needing to perform another `get_data` call.
-
-The user can then ask the AI:
-> "search my ODK MCP server and look for the `xyz` table in the database and provide me with the count of submissions"
-
-
-The AI recognizes this is a database query and seamlessly switches to using the **Database MCP Server**. It translates the natural language request into a precise SQL query, runs it against the local database, and provides the result. This allows for complex analytical queries to be resolved quickly and efficiently, turning your chat with the AI into a powerful data analysis tool.
-
-
-## PyODK MCP Server Setup & Configuration
-
-### Installation
-
-1. **Clone or download this repository**
-
-2. **Create and activate a virtual environment (recommended):**
-Install Python version 3.12 or higher then create a virtual environment
+### 2. Installation
 ```bash
-# Create Virtual env.
-py --3.12 -m venv venv
+# Clone the repository
+git clone https://github.com/joybindroo/pyodkmcp.git
+cd pyodkmcp
 
-# Activate Virtual env.
-# On Windows
-venv\Scripts\activate
-# On Linux/Unix or MacOS
-source venv/bin/activate
-```
+# Create and activate virtual environment
+python -m venv venv
+source venv/bin/activate  # Linux/MacOS
+# venv\\Scripts\\activate # Windows
 
-3. **Install dependencies:**
-```bash
+# Install dependencies
 pip install -r requirements.txt
 ```
 
-4. **Save the server script** as `odk_mcp_server.py`
+### 3. Configuration
+The server uses an environment variable to determine where to store the SQLite database.
+- **Variable**: `ODK_MCP_DB_PATH`
+- **Default**: `odk_mcp_server.db` (local directory)
 
-3. **Make it executable:**
-```bash
-chmod +x odk_mcp_server.py
-```
+---
 
-## MCP Client Configuration
+## 🔌 MCP Client Configuration
 
-### For Claude Desktop App & Other MCP Clients
-
+Example configuration for Claude Desktop or other MCP clients:
 
 ```json
 {
-   "odk_mcp_server": {
-    "command": "your_path//pyodkmcp//venv//Scripts//python.exe",
-    "args": [
-      "your_path//pyodkmcp//odk_mcp_server.py"
-      ],
+  "odk_mcp_server": {
+    "command": "python",
+    "args": ["/path/to/pyodkmcp/odk_mcp_server.py"],
     "env": {
-      "PYTHONPATH": "path//pyodkmcp"
-      }
-  },
-    "odk_mcp_sqlite_data": {
-      "command": "your_path//pymcp//venv//Scripts//python.exe",
-      "args": [
-        "your_path//pymcp//db_mcp_server.py",
-        "sqlite://your_path//odk_mcp_server.db"
-      ],
-      "env": {
-        "PYTHONPATH": "your_path//mypymcp"
-      }
+      "PYTHONPATH": "/path/to/pyodkmcp",
+      "ODK_MCP_DB_PATH": "/path/to/odk_mcp_server.db"
     }
+  },
+  "odk_mcp_sqlite_data": {
+    "command": "python",
+    "args": [
+      "/path/to/pymcp/db_mcp_server.py",
+      "sqlite:// /path/to/odk_mcp_server.db"
+    ],
+    "env": {
+      "PYTHONPATH": "/path/to/pymcp"
+    }
+  }
 }
 ```
 
-## Credentials for Accessing ODK Central Server
+## 🛣️ Roadmap
+- [ ] **Data Export**: Export synced tables to CSV/Excel.
+- [ ] **Entity Support**: Integration with ODK Central Entities for longitudinal tracking.
+- [ ] **Async DB**: Migration to `aiosqlite` for non-blocking I/O.
+- [ ] **Version Monitoring**: Integration with `PyXComparer` to detect schema changes between syncs.
 
-By default the server will run using [PyODK's configuration](https://github.com/getodk/pyodk?tab=readme-ov-file#configure)
-You need to setup PyODK configuration as mentioned in the documentation of PyODK.
-
-
-## Troubleshooting
-
-### Common Issues
-
-1. **Connection Failed:**
-   - Verify ODK Central URL is correct
-   - Check username/password
-   - Ensure ODK Central server is accessible
-
-2. **Permission Denied:**
-   - Verify user has appropriate permissions in ODK Central
-   - Check project access rights
-
-
-``
-## 🛣️ Roadmap and Future Goals
-
-This project is a work in progress, and the aim is to keep adding more useful functionalities.
-
-### ✅Achieved Features:
-- Listing Projects & Forms: The server can list all projects and forms on your ODK Central instance.
-- Data Download & Storage: The get_data tool fetches submission data and saves it to a local database for efficient access.
-- Automatic Analysis: By working with the Database MCP Server, the AI can perform automatic analysis and generate informative reports and analyses from the collected data.
-
-
-
-### 🎯Planned Features:
-- Data Export: Export form data to CSV, JSON, or Excel formats to desired folder as requested by user.
-- Form Management: Tools to create new forms or update existing ones.
-- Incorporate [PyXComparer](https://github.com/joybindroo/PyXComparer) features for XLSForm version monitoring.
-- Project Management: Functionality to create and manage ODK Central projects.
-
-
-## 🤝 Community Feedback
-
-I'm keen to hear your thoughts and feedback on this project. If you find this MCP server useful for your ODK related data collection and analysis work, please consider giving the repository a star. If you are interested in contributing or have ideas for new tools, let's work together to build a more productive ODK ecosystem. Your input is valuable for this project.
+## 🤝 Community
+If you find this server useful, please consider giving the repository a star!
