@@ -1,0 +1,12 @@
+# PyODK configuration template for this server.
+# Copy this file to pyodk_config.toml and replace the dummy values with real ones:
+#   cp pyodk_config.toml.template pyodk_config.toml
+# The server reads pyodk_config.toml from the project root automatically; set
+# PYODK_CONFIG_FILE to override it. Real credentials must never be committed:
+# pyodk_config.toml is gitignored, only this template is tracked.
+
+[central]
+base_url = "https://central.example.org"
+username = "dummy_user"
+password = "dummy_password"
+# default_project_id = 1
