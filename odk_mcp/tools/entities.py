@@ -213,18 +213,26 @@ async def merge_entities(
     :param create_source: Optional label for the source of inserted entities.
     """
     c = require_client()
-    actions = await run_blocking(
-        c.entities.merge,
-        data=data,
-        entity_list_name=entity_list_name,
-        project_id=resolve_project_id(project_id),
-        match_keys=match_keys,
-        add_new_properties=add_new_properties,
-        update_matched=update_matched,
-        delete_not_matched=delete_not_matched,
-        source_label_key=source_label_key,
-        create_source=create_source,
-    )
+    pid = resolve_project_id(project_id)
+    # pyodk's merge omits project_id on its internal calls, so set the documented
+    # default identifier it falls back to (restored afterwards).
+    previous_default = c.entities.default_project_id
+    c.entities.default_project_id = pid
+    try:
+        actions = await run_blocking(
+            c.entities.merge,
+            data=data,
+            entity_list_name=entity_list_name,
+            project_id=pid,
+            match_keys=match_keys,
+            add_new_properties=add_new_properties,
+            update_matched=update_matched,
+            delete_not_matched=delete_not_matched,
+            source_label_key=source_label_key,
+            create_source=create_source,
+        )
+    finally:
+        c.entities.default_project_id = previous_default
     return {
         "inserted": len(actions.to_insert),
         "updated": len(actions.to_update) if update_matched else 0,
