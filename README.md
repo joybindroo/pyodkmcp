@@ -77,11 +77,36 @@ The server uses an environment variable to determine where to store the SQLite d
 
 Credentials are read from `pyodk_config.toml` in the project root when it exists (copy `pyodk_config.toml.template` and fill in real values). Otherwise the standard PyODK resolution is used: the `PYODK_CONFIG_FILE` environment variable, then `~/.pyodk_config.toml`. Setting `PYODK_CONFIG_FILE` always takes precedence over the project-level file.
 
+### 4. Running the server
+
+The server speaks three MCP transports. `stdio` is the default and is what most desktop clients expect; `sse` and `streamable-http` let clients connect to an already-running server over the network.
+
+```bash
+# stdio (default) - the MCP client launches the server as a subprocess
+python odk_mcp_server.py
+
+# SSE over HTTP - any MCP client supporting the SSE transport can connect
+python odk_mcp_server.py --transport sse --host 127.0.0.1 --port 8000
+
+# streamable-http - the newer HTTP transport
+python odk_mcp_server.py --transport streamable-http --host 127.0.0.1 --port 8000
+```
+
+| Flag | Default | Description |
+|---|---|---|
+| `--transport` | `stdio` | Transport protocol: `stdio`, `sse`, or `streamable-http`. |
+| `--host` | `127.0.0.1` | Host to bind for `sse` / `streamable-http`. |
+| `--port` | `8000` | Port to bind for `sse` / `streamable-http`. |
+
+With `--transport sse`, the server exposes `http://<host>:<port>/sse` (event stream) and `http://<host>:<port>/messages/` (client messages). Bind to `0.0.0.0` to accept connections from other machines — the server has write access to ODK Central, so expose it deliberately.
+
 ---
 
 ## 🔌 MCP Client Configuration
 
-Example configuration for Claude Desktop or other MCP clients (point `command` at the project venv Python):
+### stdio (client launches the server)
+
+Example configuration for Claude Desktop or other MCP clients (point `command` at the project venv Python). The client starts its own server subprocess, so no separate launch step is needed:
 
 ```json
 {
@@ -104,6 +129,20 @@ Example configuration for Claude Desktop or other MCP clients (point `command` a
   }
 }
 ```
+
+### HTTP / SSE (client connects to a running server)
+
+Start the server first with `--transport sse` (see [Running the server](#4-running-the-server)), then point clients at its URL instead of a command:
+
+```json
+{
+  "odk_mcp_server": {
+    "url": "http://127.0.0.1:8000/sse"
+  }
+}
+```
+
+This is handy when several agents should share one server instance, or when the client cannot spawn subprocesses. If a client only supports the newer HTTP transport, use `--transport streamable-http` and its `/messages/` endpoint instead.
 
 ---
 

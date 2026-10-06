@@ -34,5 +34,14 @@ For entity (dataset) workflows, the equivalent sequence is: `list_entity_lists(p
 - **pyODKmcp**: Used for API interaction $\rightarrow$ Data Fetching $\rightarrow$ SQLite Storage.
 - **pyMCP**: Used for Natural Language $\rightarrow$ SQL $\rightarrow$ Data Analysis.
 
+## 🔌 Running & Connecting
+The server speaks the following MCP transports (see the README for full details):
+
+- **stdio** (default): the MCP client launches `odk_mcp_server.py` as a subprocess (`venv/bin/python` as command, `odk_mcp_server.py` as the single arg) — no separate start step.
+- **sse**: start once with `venv/bin/python odk_mcp_server.py --transport sse --host 127.0.0.1 --port 8000`, then clients connect to `http://127.0.0.1:8000/sse`.
+- **streamable-http**: same as `sse` with `--transport streamable-http`; clients use the `/messages/` endpoint.
+
+Credentials come from `pyodk_config.toml` in the project root (or `PYODK_CONFIG_FILE`); the SQLite path comes from `ODK_MCP_DB_PATH` (default `odk_mcp_server.db`).
+
 ## 🚀 Performance Tips
 - Avoid calling `get_data` repeatedly for the same form in a single session. Once synced, rely on the local SQLite database via pyMCP for speed and efficiency.
